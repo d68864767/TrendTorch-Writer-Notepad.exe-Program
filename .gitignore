@@ -1,0 +1,16 @@
+# Node.js
+node_modules/
+
+# Build output
+/dist/
+
+# IDE/Editor specific files
+.idea/
+.vscode/
+
+# Compiled files
+*.js
+*.js.map
+
+# Dependency directories
+/electron-builder/

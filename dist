@@ -1,0 +1,217 @@
+The code for the dist/ directory should include the following files:
+
+dist/
+  ├── index.html
+  ├── index.js
+  ├── renderer/
+  │   ├── App.js
+  │   ├── Editor.js
+  │   └── WordCount.js
+  ├── main/
+  │   ├── FileHandler.js
+  │   └── TrendTorchAPI.js
+  └── styles/
+      └── main.css
+
+Here is the code for each file:
+
+dist/index.html:
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TrendTorch Writer Notepad</title>
+  <link rel="stylesheet" href="../styles/main.css">
+</head>
+
+<body>
+  <div id="app"></div>
+  <script src="index.js"></script>
+</body>
+
+</html>
+
+
+dist/index.js:
+
+const { app, BrowserWindow } = require('electron');
+const path = require('path');
+
+app.whenReady().then(() => {
+  const mainWindow = new BrowserWindow({
+    width: 800,
+    height: 600,
+    webPreferences: {
+      nodeIntegration: true,
+      contextIsolation: false,
+    },
+  });
+
+  mainWindow.loadFile(path.join(__dirname, 'index.html'));
+
+  if (process.env.NODE_ENV === 'development') {
+    mainWindow.webContents.openDevTools();
+  }
+});
+
+app.on('window-all-closed', () => {
+  if (process.platform !== 'darwin') {
+    app.quit();
+  }
+});
+
+app.on('activate', () => {
+  if (BrowserWindow.getAllWindows().length === 0) {
+    createWindow();
+  }
+});
+
+
+dist/renderer/App.js:
+
+import React, { useState } from 'react';
+import Editor from './Editor';
+import WordCount from './WordCount';
+
+const App = () => {
+  const [text, setText] = useState('');
+
+  const handleTextChange = (event) => {
+    setText(event.target.value);
+  };
+
+  return (
+    <div className="app">
+      <Editor text={text} onTextChange={handleTextChange} />
+      <WordCount text={text} />
+    </div>
+  );
+};
+
+export default App;
+
+
+dist/renderer/Editor.js:
+
+import React from 'react';
+
+const Editor = ({ text, onTextChange }) => {
+  return (
+    <textarea
+      className="editor"
+      value={text}
+      onChange={onTextChange}
+      placeholder="Start writing..."
+    />
+  );
+};
+
+export default Editor;
+
+
+dist/renderer/WordCount.js:
+
+import React from 'react';
+
+const WordCount = ({ text }) => {
+  const wordCount = text.trim().split(/\s+/).length;
+
+  return (
+    <div className="word-count">
+      <span>Word Count: {wordCount}</span>
+    </div>
+  );
+};
+
+export default WordCount;
+
+
+dist/main/FileHandler.js:
+
+const fs = require('fs');
+const path = require('path');
+
+class FileHandler {
+  static readFile(filePath) {
+    return new Promise((resolve, reject) => {
+      fs.readFile(filePath, 'utf8', (err, data) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(data);
+        }
+      });
+    });
+  }
+
+  static writeFile(filePath, content) {
+    return new Promise((resolve, reject) => {
+      fs.writeFile(filePath, content, 'utf8', (err) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve();
+        }
+      });
+    });
+  }
+
+  static getFileName(filePath) {
+    return path.basename(filePath);
+  }
+
+  static getFileExtension(filePath) {
+    return path.extname(filePath);
+  }
+}
+
+module.exports = FileHandler;
+
+
+dist/main/TrendTorchAPI.js:
+
+class TrendTorchAPI {
+  constructor(apiKey) {
+    this.apiKey = apiKey;
+  }
+
+  async getSuggestions(text) {
+    try {
+      // Make API request to TrendTorch AI using this.apiKey and text
+      // Return the suggestions received from the API
+    } catch (error) {
+      throw new Error('Error fetching TrendTorch AI suggestions: ' + error.message);
+    }
+  }
+}
+
+module.exports = TrendTorchAPI;
+
+
+dist/styles/main.css:
+
+/* styles/main.css */
+
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+.app {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background-color: #f5f5f5;
+}
+
+.editor {
+  width: 80%;
+  height: 400px;
+  margin-bottom: 20px;
+  /* Additional
